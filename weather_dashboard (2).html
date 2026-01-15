@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Sky Background */
+        .sky-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, 
+                #001f3f 0%,
+                #0a4b78 25%,
+                #3a7ca5 50%,
+                #87CEEB 75%,
+                #ffd89b 90%,
+                #ffa751 100%
+            );
+            z-index: -1;
+            animation: skyChange 30s ease-in-out infinite;
+        }
+
+        @keyframes skyChange {
+            0%, 100% {
+                background: linear-gradient(to bottom, 
+                    #001f3f 0%,
+                    #0a4b78 25%,
+                    #3a7ca5 50%,
+                    #87CEEB 75%,
+                    #ffd89b 90%,
+                    #ffa751 100%
+                );
+            }
+            50% {
+                background: linear-gradient(to bottom, 
+                    #000428 0%,
+                    #004e92 25%,
+                    #1e88e5 50%,
+                    #64b5f6 75%,
+                    #ffeb3b 90%,
+                    #ff9800 100%
+                );
+            }
+        }
+
+        /* Sun */
+        .sun {
+            position: fixed;
+            top: 15%;
+            right: 15%;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, #fff9e6 0%, #ffeb3b 40%, #ffa726 100%);
+            border-radius: 50%;
+            box-shadow: 
+                0 0 60px #ffeb3b,
+                0 0 120px #ffa726,
+                0 0 180px rgba(255, 235, 59, 0.5);
+            animation: sunPulse 4s ease-in-out infinite, sunFloat 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes sunPulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 
+                    0 0 60px #ffeb3b,
+                    0 0 120px #ffa726,
+                    0 0 180px rgba(255, 235, 59, 0.5);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 
+                    0 0 80px #ffeb3b,
+                    0 0 150px #ffa726,
+                    0 0 220px rgba(255, 235, 59, 0.6);
+            }
+        }
+
+        @keyframes sunFloat {
+            0%, 100% {
+                top: 15%;
+                right: 15%;
+            }
+            50% {
+                top: 10%;
+                right: 20%;
+            }
+        }
+
+        /* Sun Rays */
+        .sun-ray {
+            position: fixed;
+            top: 15%;
+            right: 15%;
+            width: 400px;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                rgba(255, 235, 59, 0.8) 0%, 
+                rgba(255, 235, 59, 0.4) 50%, 
+                transparent 100%
+            );
+            transform-origin: 0 50%;
+            animation: rayRotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        .sun-ray:nth-child(1) { animation-delay: 0s; }
+        .sun-ray:nth-child(2) { animation-delay: -2.5s; }
+        .sun-ray:nth-child(3) { animation-delay: -5s; }
+        .sun-ray:nth-child(4) { animation-delay: -7.5s; }
+        .sun-ray:nth-child(5) { animation-delay: -10s; }
+        .sun-ray:nth-child(6) { animation-delay: -12.5s; }
+        .sun-ray:nth-child(7) { animation-delay: -15s; }
+        .sun-ray:nth-child(8) { animation-delay: -17.5s; }
+
+        @keyframes rayRotate {
+            from {
+                transform: translateX(75px) translateY(75px) rotate(0deg);
+            }
+            to {
+                transform: translateX(75px) translateY(75px) rotate(360deg);
+            }
+        }
+
+        /* Clouds */
+        .cloud {
+            position: fixed;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 100px;
+            z-index: -1;
+            animation: cloudFloat 60s linear infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 100px;
+        }
+
+        .cloud1 {
+            width: 120px;
+            height: 40px;
+            top: 20%;
+            left: -150px;
+            animation-duration: 45s;
+        }
+
+        .cloud1::before {
+            width: 60px;
+            height: 50px;
+            top: -25px;
+            left: 20px;
+        }
+
+        .cloud1::after {
+            width: 80px;
+            height: 45px;
+            top: -20px;
+            right: 20px;
+        }
+
+        .cloud2 {
+            width: 150px;
+            height: 50px;
+            top: 40%;
+            left: -200px;
+            animation-duration: 60s;
+            animation-delay: -15s;
+        }
+
+        .cloud2::before {
+            width: 70px;
+            height: 60px;
+            top: -30px;
+            left: 30px;
+        }
+
+        .cloud2::after {
+            width: 90px;
+            height: 55px;
+            top: -25px;
+            right: 30px;
+        }
+
+        .cloud3 {
+            width: 100px;
+            height: 35px;
+            top: 60%;
+            left: -120px;
+            animation-duration: 50s;
+            animation-delay: -30s;
+        }
+
+        .cloud3::before {
+            width: 50px;
+            height: 45px;
+            top: -20px;
+            left: 15px;
+        }
+
+        .cloud3::after {
+            width: 60px;
+            height: 40px;
+            top: -18px;
+            right: 15px;
+        }
+
+        @keyframes cloudFloat {
+            from {
+                left: -200px;
+            }
+            to {
+                left: 110%;
+            }
+        }
+
+        /* Stars (for night effect) */
+        .star {
+            position: fixed;
+            background: white;
+            border-radius: 50%;
+            animation: starTwinkle 3s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Search History Section */
+        .search-history-section {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .history-header h3 {
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .clear-history-btn {
+            padding: 8px 20px;
+            background: rgba(255, 59, 59, 0.3);
+            border: 1px solid rgba(255, 59, 59, 0.5);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .clear-history-btn:hover {
+            background: rgba(255, 59, 59, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .history-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .history-chip {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            animation: chipSlideIn 0.5s ease;
+        }
+
+        @keyframes chipSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .history-chip:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .history-chip .time {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .history-chip .remove-btn {
+            margin-left: 5px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .history-chip .remove-btn:hover {
+            opacity: 1;
+        }
+
+        .no-history {
+            text-align: center;
+            padding: 20px;
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        /* City Search */
+        .city-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            animation: fadeIn 1s ease;
+        }
+
+        .search-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #citySearch {
+            width: 100%;
+            padding: 18px 30px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            outline: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        #citySearch::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        #citySearch:focus {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .search-suggestions {
+            position: absolute;
+            top: 70px;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+
+        .search-suggestions.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            padding-left: 30px;
+        }
+
+        .suggestion-item .city-name {
+            font-weight: 600;
+        }
+
+        .suggestion-item .city-temp {
+            margin-left: auto;
+            opacity: 0.8;
+        }
+
+        /* Main Weather Card */
+        .main-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideUp 0.8s ease;
+        }
+
+        .main-weather-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .temperature-section {
+            text-align: center;
+        }
+
+        .city-name {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-date {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+
+        .temperature {
+            font-size: 6rem;
+            font-weight: 300;
+            margin: 20px 0;
+            text-shadow: 3px 3px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .weather-icon {
+            font-size: 5rem;
+            margin: 20px 0;
+            filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+        }
+
+        .weather-description {
+            font-size: 1.5rem;
+            text-transform: capitalize;
+            margin-top: 10px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .detail-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .detail-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .detail-content h3 {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .detail-content p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Sun Times Section */
+        .sun-times {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .sun-time-item {
+            text-align: center;
+        }
+
+        .sun-time-item .icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .sun-time-item h3 {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .sun-time-item p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Nearby Cities Section */
+        .nearby-section {
+            animation: fadeIn 1.2s ease;
+        }
+
+        .nearby-header {
+            font-size: 2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .nearby-cities {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .city-card {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            animation: fadeIn 1s ease;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .city-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .city-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .city-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .city-card .temp {
+            font-size: 2.5rem;
+            font-weight: 300;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .city-card .weather-icon {
+            font-size: 3rem;
+            text-align: center;
+            margin: 15px 0;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .city-card .description {
+            text-align: center;
+            font-size: 1rem;
+            text-transform: capitalize;
+            margin-bottom: 15px;
+        }
+
+        .city-card-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+
+        .mini-detail {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .mini-detail .label {
+            opacity: 0.8;
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+        }
+
+        .mini-detail .value {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .sun {
+                width: 100px;
+                height: 100px;
+                top: 10%;
+                right: 10%;
+            }
+
+            .sun-ray {
+                width: 250px;
+            }
+
+            .main-weather-info {
+                grid-template-columns: 1fr;
+            }
+
+            .temperature {
+                font-size: 4rem;
+            }
+
+            .weather-details {
+                grid-template-columns: 1fr;
+            }
+
+            .sun-times {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .nearby-cities {
+                grid-template-columns: 1fr;
+            }
+
+            .history-chips {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sky Background -->
+    <div class="sky-background"></div>
+    
+    <!-- Sun -->
+    <div class="sun"></div>
+    
+    <!-- Sun Rays -->
+    <div class="sun-ray"></div>
+    <div class="sun-ray"></div>
+    <div class="sun-ray"></div>
+    <div class="sun-ray"></div>
+    <div class="sun-ray"></div>
+    <div class="sun-ray"></div>
+    <div class="sun-ray"></div>
+    <div class="sun-ray"></div>
+    
+    <!-- Clouds -->
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="cloud cloud3"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🌤️ Weather Dashboard</h1>
+            <p>Real-time weather information at your fingertips</p>
+        </div>
+
+        <!-- Search History -->
+        <div class="search-history-section">
+            <div class="history-header">
+                <h3>
+                    <span>🕒</span>
+                    <span>Recent Searches</span>
+                </h3>
+                <button class="clear-history-btn" onclick="clearHistory()">Clear All</button>
+            </div>
+            <div class="history-chips" id="historyChips">
+                <div class="no-history">No search history yet. Select a city to begin!</div>
+            </div>
+        </div>
+
+        <!-- City Search -->
+        <div class="city-selector">
+            <div class="search-container">
+                <input 
+                    type="text" 
+                    id="citySearch" 
+                    placeholder="🔍 Search city (e.g., Pune, Mumbai, Delhi...)"
+                    autocomplete="off"
+                    oninput="filterCities()"
+                />
+                <div class="search-suggestions" id="searchSuggestions"></div>
+            </div>
+        </div>
+
+        <!-- Main Weather Card -->
+        <div class="main-card" id="mainCard">
+            <div class="main-weather-info">
+                <div class="temperature-section">
+                    <h2 class="city-name" id="mainCityName">Mumbai</h2>
+                    <p class="current-date" id="currentDate">Thursday, January 15, 2026</p>
+                    <div class="weather-icon" id="mainWeatherIcon">☀️</div>
+                    <div class="temperature" id="mainTemperature">28°C</div>
+                    <p class="weather-description" id="mainWeatherDesc">Clear Sky</p>
+                </div>
+
+                <div class="weather-details">
+                    <div class="detail-item">
+                        <div class="detail-icon">💧</div>
+                        <div class="detail-content">
+                            <h3>Humidity</h3>
+                            <p id="mainHumidity">65%</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-icon">💨</div>
+                        <div class="detail-content">
+                            <h3>Air Quality</h3>
+                            <p id="mainAirQuality">Good</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-icon">🌫️</div>
+                        <div class="detail-content">
+                            <h3>Visibility</h3>
+                            <p id="mainVisibility">10 km</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-item">
+                        <div class="detail-icon">☀️</div>
+                        <div class="detail-content">
+                            <h3>UV Index</h3>
+                            <p id="mainUV">7 (High)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sun Times -->
+            <div class="sun-times">
+                <div class="sun-time-item">
+                    <div class="icon">🌅</div>
+                    <h3>Sunrise</h3>
+                    <p id="mainSunrise">6:45 AM</p>
+                </div>
+                <div class="sun-time-item">
+                    <div class="icon">🌇</div>
+                    <h3>Sunset</h3>
+                    <p id="mainSunset">6:30 PM</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nearby Cities -->
+        <div class="nearby-section">
+            <h2 class="nearby-header">Nearby Cities Weather</h2>
+            <div class="nearby-cities" id="nearbyCities">
+                <!-- Nearby city cards will be dynamically generated -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Weather data for different cities
+        const weatherData = {
+            mumbai: {
+                name: 'Mumbai',
+                temp: 28,
+                icon: '☀️',
+                description: 'Clear Sky',
+                humidity: 65,
+                airQuality: 'Moderate',
+                visibility: '10 km',
+                uv: '7 (High)',
+                sunrise: '6:45 AM',
+                sunset: '6:30 PM',
+                nearby: [
+                    { name: 'Thane', temp: 27, icon: '🌤️', desc: 'Partly Cloudy', humidity: 68, airQuality: 'Moderate', visibility: '9 km', uv: 6 },
+                    { name: 'Navi Mumbai', temp: 28, icon: '☀️', desc: 'Clear', humidity: 64, airQuality: 'Good', visibility: '11 km', uv: 7 },
+                    { name: 'Pune', temp: 26, icon: '⛅', desc: 'Cloudy', humidity: 58, airQuality: 'Good', visibility: '12 km', uv: 5 },
+                    { name: 'Nashik', temp: 25, icon: '🌤️', desc: 'Partly Cloudy', humidity: 55, airQuality: 'Good', visibility: '13 km', uv: 6 },
+                    { name: 'Kalyan', temp: 27, icon: '☀️', desc: 'Sunny', humidity: 66, airQuality: 'Moderate', visibility: '10 km', uv: 7 }
+                ]
+            },
+            delhi: {
+                name: 'Delhi',
+                temp: 18,
+                icon: '🌫️',
+                description: 'Foggy',
+                humidity: 72,
+                airQuality: 'Poor',
+                visibility: '5 km',
+                uv: '3 (Low)',
+                sunrise: '7:10 AM',
+                sunset: '5:45 PM',
+                nearby: [
+                    { name: 'Gurgaon', temp: 17, icon: '🌫️', desc: 'Fog', humidity: 74, airQuality: 'Poor', visibility: '4 km', uv: 2 },
+                    { name: 'Noida', temp: 18, icon: '🌫️', desc: 'Hazy', humidity: 73, airQuality: 'Poor', visibility: '5 km', uv: 3 },
+                    { name: 'Faridabad', temp: 17, icon: '☁️', desc: 'Overcast', humidity: 71, airQuality: 'Moderate', visibility: '6 km', uv: 3 },
+                    { name: 'Ghaziabad', temp: 18, icon: '🌫️', desc: 'Foggy', humidity: 75, airQuality: 'Poor', visibility: '4 km', uv: 2 },
+                    { name: 'Meerut', temp: 16, icon: '☁️', desc: 'Cloudy', humidity: 70, airQuality: 'Moderate', visibility: '7 km', uv: 3 }
+                ]
+            },
+            bangalore: {
+                name: 'Bangalore',
+                temp: 24,
+                icon: '⛅',
+                description: 'Partly Cloudy',
+                humidity: 58,
+                airQuality: 'Good',
+                visibility: '15 km',
+                uv: '6 (Moderate)',
+                sunrise: '6:30 AM',
+                sunset: '6:15 PM',
+                nearby: [
+                    { name: 'Mysore', temp: 23, icon: '🌤️', desc: 'Sunny', humidity: 56, airQuality: 'Good', visibility: '16 km', uv: 6 },
+                    { name: 'Tumkur', temp: 25, icon: '☀️', desc: 'Clear', humidity: 54, airQuality: 'Good', visibility: '17 km', uv: 7 },
+                    { name: 'Mandya', temp: 24, icon: '⛅', desc: 'Partly Cloudy', humidity: 57, airQuality: 'Good', visibility: '15 km', uv: 6 },
+                    { name: 'Ramanagara', temp: 24, icon: '🌤️', desc: 'Fair', humidity: 55, airQuality: 'Good', visibility: '16 km', uv: 6 },
+                    { name: 'Kolar', temp: 26, icon: '☀️', desc: 'Sunny', humidity: 52, airQuality: 'Good', visibility: '18 km', uv: 7 }
+                ]
+            },
+            chennai: {
+                name: 'Chennai',
+                temp: 30,
+                icon: '☀️',
+                description: 'Hot & Sunny',
+                humidity: 78,
+                airQuality: 'Good',
+                visibility: '12 km',
+                uv: '9 (Very High)',
+                sunrise: '6:20 AM',
+                sunset: '6:10 PM',
+                nearby: [
+                    { name: 'Kanchipuram', temp: 29, icon: '☀️', desc: 'Sunny', humidity: 76, airQuality: 'Good', visibility: '12 km', uv: 9 },
+                    { name: 'Chengalpattu', temp: 30, icon: '☀️', desc: 'Hot', humidity: 77, airQuality: 'Good', visibility: '11 km', uv: 9 },
+                    { name: 'Mahabalipuram', temp: 29, icon: '🌤️', desc: 'Breezy', humidity: 80, airQuality: 'Good', visibility: '13 km', uv: 8 },
+                    { name: 'Tiruvallur', temp: 31, icon: '☀️', desc: 'Very Hot', humidity: 75, airQuality: 'Good', visibility: '12 km', uv: 10 },
+                    { name: 'Vellore', temp: 28, icon: '⛅', desc: 'Partly Cloudy', humidity: 72, airQuality: 'Good', visibility: '14 km', uv: 8 }
+                ]
+            },
+            kolkata: {
+                name: 'Kolkata',
+                temp: 22,
+                icon: '🌤️',
+                description: 'Pleasant',
+                humidity: 70,
+                airQuality: 'Moderate',
+                visibility: '9 km',
+                uv: '5 (Moderate)',
+                sunrise: '6:15 AM',
+                sunset: '5:20 PM',
+                nearby: [
+                    { name: 'Howrah', temp: 22, icon: '🌤️', desc: 'Pleasant', humidity: 71, airQuality: 'Moderate', visibility: '9 km', uv: 5 },
+                    { name: 'Salt Lake', temp: 23, icon: '☀️', desc: 'Sunny', humidity: 68, airQuality: 'Good', visibility: '10 km', uv: 6 },
+                    { name: 'Barrackpore', temp: 21, icon: '⛅', desc: 'Cloudy', humidity: 72, airQuality: 'Moderate', visibility: '8 km', uv: 4 },
+                    { name: 'Durgapur', temp: 20, icon: '☁️', desc: 'Overcast', humidity: 74, airQuality: 'Moderate', visibility: '7 km', uv: 4 },
+                    { name: 'Asansol', temp: 21, icon: '🌤️', desc: 'Fair', humidity: 69, airQuality: 'Moderate', visibility: '9 km', uv: 5 }
+                ]
+            },
+            pune: {
+                name: 'Pune',
+                temp: 26,
+                icon: '⛅',
+                description: 'Cloudy',
+                humidity: 58,
+                airQuality: 'Good',
+                visibility: '12 km',
+                uv: '5 (Moderate)',
+                sunrise: '6:50 AM',
+                sunset: '6:25 PM',
+                nearby: [
+                    { name: 'Pimpri-Chinchwad', temp: 26, icon: '⛅', desc: 'Cloudy', humidity: 59, airQuality: 'Good', visibility: '12 km', uv: 5 },
+                    { name: 'Lonavala', temp: 23, icon: '🌧️', desc: 'Light Rain', humidity: 82, airQuality: 'Good', visibility: '8 km', uv: 3 },
+                    { name: 'Shirur', temp: 27, icon: '☀️', desc: 'Sunny', humidity: 55, airQuality: 'Good', visibility: '14 km', uv: 6 },
+                    { name: 'Baramati', temp: 28, icon: '🌤️', desc: 'Fair', humidity: 54, airQuality: 'Good', visibility: '13 km', uv: 6 },
+                    { name: 'Solapur', temp: 29, icon: '☀️', desc: 'Hot', humidity: 52, airQuality: 'Good', visibility: '15 km', uv: 7 }
+                ]
+            },
+            hyderabad: {
+                name: 'Hyderabad',
+                temp: 27,
+                icon: '☀️',
+                description: 'Sunny',
+                humidity: 62,
+                airQuality: 'Good',
+                visibility: '14 km',
+                uv: '7 (High)',
+                sunrise: '6:35 AM',
+                sunset: '6:15 PM',
+                nearby: [
+                    { name: 'Secunderabad', temp: 27, icon: '☀️', desc: 'Sunny', humidity: 61, airQuality: 'Good', visibility: '14 km', uv: 7 },
+                    { name: 'Rangareddy', temp: 28, icon: '🌤️', desc: 'Clear', humidity: 60, airQuality: 'Good', visibility: '15 km', uv: 7 },
+                    { name: 'Medchal', temp: 26, icon: '⛅', desc: 'Partly Cloudy', humidity: 63, airQuality: 'Good', visibility: '13 km', uv: 6 },
+                    { name: 'Sangareddy', temp: 27, icon: '☀️', desc: 'Sunny', humidity: 59, airQuality: 'Good', visibility: '15 km', uv: 7 },
+                    { name: 'Warangal', temp: 29, icon: '☀️', desc: 'Hot', humidity: 57, airQuality: 'Good', visibility: '16 km', uv: 8 }
+                ]
+            },
+            nashik: {
+                name: 'Nashik',
+                temp: 25,
+                icon: '🌤️',
+                description: 'Partly Cloudy',
+                humidity: 55,
+                airQuality: 'Good',
+                visibility: '13 km',
+                uv: '6 (Moderate)',
+                sunrise: '6:48 AM',
+                sunset: '6:28 PM',
+                nearby: [
+                    { name: 'Trimbak', temp: 24, icon: '⛅', desc: 'Cloudy', humidity: 58, airQuality: 'Good', visibility: '12 km', uv: 5 },
+                    { name: 'Igatpuri', temp: 22, icon: '🌧️', desc: 'Light Showers', humidity: 75, airQuality: 'Good', visibility: '9 km', uv: 4 },
+                    { name: 'Sinnar', temp: 26, icon: '☀️', desc: 'Sunny', humidity: 53, airQuality: 'Good', visibility: '14 km', uv: 6 },
+                    { name: 'Malegaon', temp: 25, icon: '🌤️', desc: 'Fair', humidity: 56, airQuality: 'Good', visibility: '13 km', uv: 6 },
+                    { name: 'Ahmednagar', temp: 27, icon: '☀️', desc: 'Clear', humidity: 52, airQuality: 'Good', visibility: '15 km', uv: 7 }
+                ]
+            }
+        };
+
+        // Search history management
+        let searchHistory = [];
+
+        // Load history from localStorage on init
+        function loadHistory() {
+            const stored = localStorage.getItem('weatherSearchHistory');
+            if (stored) {
+                try {
+                    searchHistory = JSON.parse(stored);
+                } catch (e) {
+                    searchHistory = [];
+                }
+            }
+        }
+
+        function addToHistory(cityName) {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            // Remove duplicate if exists
+            searchHistory = searchHistory.filter(item => item.city !== cityName);
+            
+            // Add to beginning
+            searchHistory.unshift({
+                city: cityName,
+                time: timeString,
+                timestamp: now.getTime()
+            });
+            
+            // Keep only last 10 searches
+            if (searchHistory.length > 10) {
+                searchHistory = searchHistory.slice(0, 10);
+            }
+            
+            localStorage.setItem('weatherSearchHistory', JSON.stringify(searchHistory));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const historyContainer = document.getElementById('historyChips');
+            
+            if (searchHistory.length === 0) {
+                historyContainer.innerHTML = '<div class="no-history">No search history yet. Search for a city to begin!</div>';
+                return;
+            }
+            
+            historyContainer.innerHTML = '';
+            
+            searchHistory.forEach((item, index) => {
+                const chip = document.createElement('div');
+                chip.className = 'history-chip';
+                chip.style.animationDelay = (index * 0.1) + 's';
+                chip.innerHTML = `
+                    <span>📍</span>
+                    <span>${item.city}</span>
+                    <span class="time">${item.time}</span>
+                    <span class="remove-btn">✕</span>
+                `;
+                
+                // Add click handler to chip (not on remove button)
+                chip.addEventListener('click', (e) => {
+                    if (!e.target.classList.contains('remove-btn')) {
+                        const cityKey = item.city.toLowerCase();
+                        if (weatherData[cityKey]) {
+                            document.getElementById('citySearch').value = item.city;
+                            updateWeather(cityKey);
+                            document.getElementById('searchSuggestions').classList.remove('active');
+                        }
+                    }
+                });
+
+                // Add click handler to remove button
+                const removeBtn = chip.querySelector('.remove-btn');
+                removeBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeFromHistory(item.city);
+                });
+                
+                historyContainer.appendChild(chip);
+            });
+        }
+
+        function removeFromHistory(cityName) {
+            searchHistory = searchHistory.filter(item => item.city !== cityName);
+            localStorage.setItem('weatherSearchHistory', JSON.stringify(searchHistory));
+            renderHistory();
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all search history?')) {
+                searchHistory = [];
+                localStorage.removeItem('weatherSearchHistory');
+                renderHistory();
+            }
+        }
+
+        // City search functionality
+        const cities = [
+            { key: 'mumbai', name: 'Mumbai' },
+            { key: 'delhi', name: 'Delhi' },
+            { key: 'bangalore', name: 'Bangalore' },
+            { key: 'chennai', name: 'Chennai' },
+            { key: 'kolkata', name: 'Kolkata' },
+            { key: 'pune', name: 'Pune' },
+            { key: 'hyderabad', name: 'Hyderabad' },
+            { key: 'nashik', name: 'Nashik' }
+        ];
+
+        function filterCities() {
+            const input = document.getElementById('citySearch').value.toLowerCase();
+            const suggestions = document.getElementById('searchSuggestions');
+            
+            if (input.length === 0) {
+                suggestions.classList.remove('active');
+                return;
+            }
+            
+            const filtered = cities.filter(city => 
+                city.name.toLowerCase().includes(input) || 
+                city.key.includes(input)
+            );
+            
+            if (filtered.length === 0) {
+                suggestions.innerHTML = '<div class="suggestion-item">No cities found</div>';
+                suggestions.classList.add('active');
+                return;
+            }
+            
+            suggestions.innerHTML = '';
+            filtered.forEach(city => {
+                const data = weatherData[city.key];
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <span>📍</span>
+                    <span class="city-name">${city.name}</span>
+                    <span class="city-temp">${data.temp}°C ${data.icon}</span>
+                `;
+                item.addEventListener('click', () => {
+                    document.getElementById('citySearch').value = city.name;
+                    updateWeather(city.key);
+                    suggestions.classList.remove('active');
+                });
+                suggestions.appendChild(item);
+            });
+            
+            suggestions.classList.add('active');
+        }
+
+        // Close suggestions when clicking outside
+        document.addEventListener('click', (e) => {
+            const searchContainer = document.querySelector('.search-container');
+            if (!searchContainer.contains(e.target)) {
+                document.getElementById('searchSuggestions').classList.remove('active');
+            }
+        });
+
+        // Initialize dashboard
+        function initDashboard() {
+            loadHistory();
+            updateWeather('pune'); // Default to Pune
+            renderHistory();
+        }
+
+        // Update weather information
+        function updateWeather(city) {
+            const data = weatherData[city];
+            
+            // Add to history
+            addToHistory(data.name);
+            
+            // Update main card
+            document.getElementById('mainCityName').textContent = data.name;
+            document.getElementById('mainWeatherIcon').textContent = data.icon;
+            document.getElementById('mainTemperature').textContent = data.temp + '°C';
+            document.getElementById('mainWeatherDesc').textContent = data.description;
+            document.getElementById('mainHumidity').textContent = data.humidity + '%';
+            document.getElementById('mainAirQuality').textContent = data.airQuality;
+            document.getElementById('mainVisibility').textContent = data.visibility;
+            document.getElementById('mainUV').textContent = data.uv;
+            document.getElementById('mainSunrise').textContent = data.sunrise;
+            document.getElementById('mainSunset').textContent = data.sunset;
+
+            // Update nearby cities
+            const nearbyCitiesContainer = document.getElementById('nearbyCities');
+            nearbyCitiesContainer.innerHTML = '';
+
+            data.nearby.forEach((nearbyCity, index) => {
+                const cityCard = document.createElement('div');
+                cityCard.className = 'city-card';
+                cityCard.style.animationDelay = (index * 0.1) + 's';
+                
+                cityCard.innerHTML = `
+                    <div class="city-card-header">
+                        <h3>${nearbyCity.name}</h3>
+                        <span class="temp">${nearbyCity.temp}°C</span>
+                    </div>
+                    <div class="weather-icon">${nearbyCity.icon}</div>
+                    <p class="description">${nearbyCity.desc}</p>
+                    <div class="city-card-details">
+                        <div class="mini-detail">
+                            <div class="label">💧 Humidity</div>
+                            <div class="value">${nearbyCity.humidity}%</div>
+                        </div>
+                        <div class="mini-detail">
+                            <div class="label">💨 Air Quality</div>
+                            <div class="value">${nearbyCity.airQuality}</div>
+                        </div>
+                        <div class="mini-detail">
+                            <div class="label">🌫️ Visibility</div>
+                            <div class="value">${nearbyCity.visibility}</div>
+                        </div>
+                        <div class="mini-detail">
+                            <div class="label">☀️ UV Index</div>
+                            <div class="value">${nearbyCity.uv}</div>
+                        </div>
+                    </div>
+                `;
+
+                cityCard.addEventListener('click', () => {
+                    cityCard.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        cityCard.style.transform = '';
+                    }, 200);
+                });
+
+                nearbyCitiesContainer.appendChild(cityCard);
+            });
+        }
+
+        // Get current date
+        function updateDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById('currentDate').textContent = today.toLocaleDateString('en-US', options);
+        }
+
+        // Create stars
+        function createStars() {
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 50 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                document.body.appendChild(star);
+            }
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateDate();
+            initDashboard();
+            createStars();
+        });
+
+        // Add hover effect to cards
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainCard = document.querySelector('.main-card');
+            
+            mainCard.addEventListener('mouseenter', () => {
+                mainCard.style.transform = 'scale(1.02)';
+                mainCard.style.transition = 'transform 0.3s ease';
+            });
+
+            mainCard.addEventListener('mouseleave', () => {
+                mainCard.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
